@@ -23,8 +23,9 @@ class CustomQueryBuilderService extends BaseApplicationComponent
 
       /**
       * Add '$dbCommand->leftJoin' & '$dbCommand->like' where added to account for custom record table
+      * ***NOTE: dbCommand->addSelect('') allows you to add adition columns to a query from another 'related' ElementCriteriaModel
       */
-
+      // $dbCommand->addSelect('');
       // $dbCommand->leftJoin('table_name_goes_here table_name_goes_here', 'table_name_goes_here.entryId = elements.id');
       // $dbCommand->where(array('like', 'awardYears', '%'.$queryVar.'%'));
 
