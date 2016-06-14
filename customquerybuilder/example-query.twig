@@ -1,0 +1,35 @@
+{# Setup Pagination #}
+{% set entriesPerPage = 3 %}
+
+{% set page = craft.request.getParam('page') %}
+{% set page = page ?: 1 %}
+{% set offsetParam = (page - 1) * entriesPerPage %}
+
+{% set numberOfEntries = craft.customQueryBuilder.customQuery()|length %}
+{% set isNextPage = numberOfEntries > (page * entriesPerPage) ? true : null %}
+{% set isPrevPage = page > 1 ? true : null %}
+{% set queryString = craft.request.getQueryStringWithoutPath()|replace('/page=\\d+&?/') %}
+{% set queryString = queryString ? '&' ~ queryString %}
+{% set nextUrl = isNextPage is not null ? craft.request.url ~ '?page=' ~ (page + 1) ~ queryString : null %}
+{% set prevUrl = isPrevPage is not null ? craft.request.url ~ '?page=' ~ (page - 1) ~ queryString : null %}
+
+
+<div class="entries-wrapper">
+    {# THIS IS THE CUSTOM QUERY
+    # customQueryBuilder -> is the name of the plugin
+    # customQuery -> is the name of the function within plugin's variable's folder
+    # page & entriesPerPage -> (optional) These correlate to the variable set above to init pagination.
+    #}
+    {% for entry in craft.customQueryBuilder.customQuery(page, entriesPerPage) %}
+      <ul>
+        <li><p>{{entry.title}}</p></li>
+      </ul>
+    {% endfor %}
+</div>
+
+{% if (prevUrl is not null) or (nextUrl is not null) %}
+    <div class="entries-pagination">
+        {% if prevUrl is not null %}<a href="{{ prevUrl }}">Previous Page</a>{% endif %}
+        {% if nextUrl is not null %}<a href="{{ nextUrl }}">Next Page</a>{% endif %}
+    </div>
+{% endif %}
