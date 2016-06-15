@@ -10,9 +10,9 @@ class CustomQueryBuilderVariable
    * This function runs the plugin's CustomQueryBuilderService -> customQuery() function.
    */
 
-  public function customQuery($currentPage = null, $entriesPerPage = null, $queryVar = null)
+  public function customQuery(ElementCriteriaModel $criteria, ElementCriteriaModel $relation = null, $queryVar = null)
   {
-      return craft()->customQueryBuilder->customQuery($currentPage, $entriesPerPage, $queryVar);
+      return craft()->customQueryBuilder->initCustomQuery($criteria, $relation, $queryVar);
   }
 
 

@@ -7,37 +7,71 @@ namespace Craft;
 class CustomQueryBuilderService extends BaseApplicationComponent
 {
 
+  protected $criteria;
+  protected $dbCommand;
+
+
   /**
    * Custom Query With Pagination Option
    */
-
-  public function customQuery($currentPage, $entriesPerPage, $queryVar)
+  public function initCustomQuery($criteria, $relation, $queryVar)
   {
     // Extending the ElementCriteriaModel with buildElementsQuery()
-      $criteria = craft()->elements->getCriteria(ElementType::Entry);
-      $criteria->section = '********* SECTION_HANLE_GOES_HERE *********';
-      $criteria->limit = $entriesPerPage;
-      $dbCommand = craft()->elements->buildElementsQuery($criteria);
-      $dbCommand->setOrder(array('title asc'));
-      $dbCommand->offset(($currentPage-1) * $entriesPerPage);
+      $this->criteria = $criteria;
+      $this->criteria->relatedTo = $relation;
+      $this->dbCommand = craft()->elements->buildElementsQuery($this->criteria);
+      $this->dbCommand->setOrder('title asc');
 
       /**
       * Add '$dbCommand->leftJoin' & '$dbCommand->like' where added to account for custom record table
-      * ***NOTE: dbCommand->addSelect('') allows you to add adition columns to a query from another 'related' ElementCriteriaModel
+      * *** dbCommand->addSelect('') allows you to add adition columns to a query from another 'related' ElementCriteriaModel
       */
       // $dbCommand->addSelect('');
       // $dbCommand->leftJoin('table_name_goes_here table_name_goes_here', 'table_name_goes_here.entryId = elements.id');
       // $dbCommand->where(array('like', 'awardYears', '%'.$queryVar.'%'));
 
-
-    // If dbCommand is null, no point in running query, so we return emply Entry Model
-      if (! $dbCommand){
-        return EntryModel::populateModels(null);
-      } else {
-        return EntryModel::populateModels($dbCommand->queryAll());
-      }
-
+      return $this;
   }
+
+
+
+
+  /**
+   * This function gives the query the ability to utilize pagination
+   */
+  public function customPagination($currentPage = null, $entriesPerPage = null)
+  {
+      // DELETE THIS ONCE DONE CONFIGURING PLUGIN
+      echo "<fieldset>
+              <legend><b>Info From Plugin 'CustomQueryBuilder'</b></legend>
+              <p>Current Page: " . $currentPage . "</p>
+              <p>Entries Per Page: " . $entriesPerPage . "</p>
+            </fieldset>";
+
+      $this->dbCommand->limit($entriesPerPage);
+      $this->dbCommand->offset(($currentPage-1) * $entriesPerPage);
+      return $this;
+  }
+
+
+
+
+
+
+  /**
+   * This function runs the query and populates the models so they can be used within a Craft CMS Twig template.
+   */
+  public function runQuery()
+  {
+    // If dbCommand is null, no point in running query, so we return emply Entry Model
+      if (! $this->dbCommand) {
+          return $this->criteria->find();
+      }
+      $result = $this->dbCommand->queryAll();
+      return EntryModel::populateModels($result);
+  }
+
+
 
 
   /**
