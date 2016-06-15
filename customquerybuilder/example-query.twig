@@ -1,11 +1,14 @@
-{# Setup Pagination #}
-{% set entriesPerPage = 3 %}
+{# Setup Content #}
+{% set source = craft.entries.section('newsAndEventsEntry').limit(50) %}
+{% set relationship = craft.categories.group('newsAndEvents').slug('events') %}
 
+{% set entriesPerPage = 5 %}
 {% set page = craft.request.getParam('page') %}
 {% set page = page ?: 1 %}
 {% set offsetParam = (page - 1) * entriesPerPage %}
 
-{% set numberOfEntries = craft.customQueryBuilder.customQuery()|length %}
+{% set numberOfEntries = craft.customQueryBuilder.customQuery(source).runQuery()|length %}
+
 {% set isNextPage = numberOfEntries > (page * entriesPerPage) ? true : null %}
 {% set isPrevPage = page > 1 ? true : null %}
 {% set queryString = craft.request.getQueryStringWithoutPath()|replace('/page=\\d+&?/') %}
@@ -15,17 +18,15 @@
 
 
 <div class="entries-wrapper">
-    {# THIS IS THE CUSTOM QUERY
-    # customQueryBuilder -> is the name of the plugin
-    # customQuery -> is the name of the function within plugin's variable's folder
-    # page & entriesPerPage -> (optional) These correlate to the variable set above to init pagination.
-    #}
-    {% for entry in craft.customQueryBuilder.customQuery(page, entriesPerPage) %}
+    {{"Total Entries: "~numberOfEntries}}<br/>
+    {% for entry in craft.customQueryBuilder.customQuery(source, relationship).customPagination(page, entriesPerPage).runQuery() %}
       <ul>
         <li><p>{{entry.title}}</p></li>
+        <li><p>{{entry.subtitle}}</p></li>
       </ul>
     {% endfor %}
 </div>
+
 
 {% if (prevUrl is not null) or (nextUrl is not null) %}
     <div class="entries-pagination">

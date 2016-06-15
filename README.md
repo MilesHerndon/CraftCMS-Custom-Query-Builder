@@ -13,17 +13,26 @@ With this plugin, you will have the ability to...
 * Create a custom Database Table to incorporate into your custom queries.
 * Utilize the built in pagination option after your query is injected into your template.
 
-
+***
 ### Installation
 
 Add the `customquerybuilder` folder to your `craft/app/plugins` directory, then activate the Custom Query Builder plugin in the `settings/plugins` section of the Craft's control panel. _*Note:_ If you edit any of the `records` or `models` files, the plugin will have to be uninstalled and reinstalled for those changes to take effect.
 
 
+***
 
 ### Usage Within Twig Template
 
-There is an example of how to get started using this plugin in the `example-query.twig` file of the plugin's directory. However, below is the basic query that is run within that file. The `page` & `entriesPerPage` variables are optional and are only used if you wish to utilize the pagination feature.
+There is an example of how to get started using this plugin in the `example-query.twig` file of the plugin's directory. However, below is the basic query that is run within that file. The `page` & `entriesPerPage` variables are optional and are only used if you wish to utilize the pagination feature. The `customQuery(source)` is required and that is where the ElementCriteriaModel goes from you template, but the `customQuery(relationship)` parameter is optional. All depends if you want to relate the query's source to another ElementCriteriaModel.
+
+
+###### Available parameters...
+> * customQuery(source) – required!, Sets the stage for what ElementCriteriaModel the plugin will query.
+> * customQuery(relationship) – optional, Connect the source's ElementCriteriaModel to another ElementCriteriaModel.
+> * customPagination(page) - optional, To utilize the pagination feature
+> * customPagination(entriesPerPage) - optional, To utilize the pagination feature
+> * runQuery() - required! This executes the query.
 
 ```twig
-craft.customQueryBuilder.customQuery(page, entriesPerPage)
+craft.customQueryBuilder.customQuery(source, relationship).customPagination(page, entriesPerPage).runQuery()
 ```
